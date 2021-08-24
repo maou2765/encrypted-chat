@@ -19,7 +19,7 @@ type DBConfig struct {
 func BuildDBConfig() *DBConfig {
 	dbConfig := DBConfig{
 		Host:     "127.0.0.10",
-		Port:     6603,
+		Port:     3306,
 		User:     "root",
 		Password: "my-secret-pw",
 		DBName:   "encrypted_chat_db",

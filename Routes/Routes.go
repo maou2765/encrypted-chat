@@ -1,15 +1,16 @@
 package Routes
 
 import (
+	"encrypted-chat/Controllers"
+	"encrypted-chat/Middlewares"
+	"encrypted-chat/Models"
 	"io"
 	"log"
-	"maou2765/encrypted-chat/Controllers"
-	"maou2765/encrypted-chat/Middlewares"
-	"maou2765/encrypted-chat/Models"
 	"net/http"
 	"os"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,11 +23,18 @@ func welcomeHandler(c *gin.Context) {
 		"text":     "Welcome",
 	})
 }
-
+func createHTMLRender() multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+	r.AddFromFiles("login", "templates/layouts/base.html", "templates/login/index.html")
+	r.AddFromFiles("signup", "templates/layouts/base.html", "templates/signup/index.html")
+	return r
+}
 func SetupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	r := gin.Default()
+	r.Use(gin.Recovery())
+	r.HTMLRender = createHTMLRender()
 
 	gin.DefaultWriter = io.MultiWriter(os.Stdout)
 
@@ -41,7 +49,10 @@ func SetupRouter() *gin.Engine {
 		log.Fatal("authMiddleware.MiddlewareInit() Error:" + err.Error())
 	}
 
+	r.GET("/login", Controllers.LoginIndex)
 	r.POST("/login", authMiddleware.LoginHandler)
+	r.GET("/signup", Controllers.SignupIndex)
+	r.POST("/signup", Controllers.Signup)
 
 	r.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
@@ -55,15 +66,14 @@ func SetupRouter() *gin.Engine {
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{
 		auth.GET("/hello", welcomeHandler)
-	}
-
-	grp1 := r.Group("/user-api")
-	{
-		grp1.GET("user", Controllers.GetUsers)
-		grp1.POST("user", Controllers.CreateUser)
-		grp1.GET("user/:id", Controllers.GetUserByID)
-		grp1.PUT("user/:id", Controllers.UpdateUser)
-		grp1.DELETE("user/:id", Controllers.DeleteUser)
+		grp1 := auth.Group("/user-api")
+		{
+			grp1.GET("user", Controllers.GetUsers)
+			grp1.POST("user", Controllers.CreateUser)
+			grp1.GET("user/:id", Controllers.GetUserByID)
+			grp1.PUT("user/:id", Controllers.UpdateUser)
+			grp1.DELETE("user/:id", Controllers.DeleteUser)
+		}
 	}
 
 	return r

@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encrypted-chat/Config"
+	"encrypted-chat/Models"
+	"encrypted-chat/Routes"
 	"fmt"
-	"maou2765/encrypted-chat/Config"
-	"maou2765/encrypted-chat/Models"
-	"maou2765/encrypted-chat/Routes"
 
 	"github.com/jinzhu/gorm"
 )

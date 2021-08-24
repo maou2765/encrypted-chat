@@ -3,8 +3,8 @@
 package Models
 
 import (
+	"encrypted-chat/Config"
 	"fmt"
-	"maou2765/encrypted-chat/Config"
 
 	_ "github.com/go-sql-driver/mysql"
 )

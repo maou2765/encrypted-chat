@@ -1,12 +1,13 @@
 package Middlewares
 
 import (
+	"encrypted-chat/Models"
 	"log"
-	"maou2765/encrypted-chat/Models"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type login struct {
@@ -47,19 +48,21 @@ func AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			password := loginVals.Password
 			var user Models.User
 			err := Models.Login(&user, email)
-
-			if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
-				return &Models.User{
-					Email:     userID,
-					GivenName: "Bo-Yi",
-					SurnName:  "Wu",
-				}, nil
+			if err != nil {
+				return "", jwt.ErrFailedAuthentication
 			}
 
-			return nil, jwt.ErrFailedAuthentication
+			if passwordErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); passwordErr != nil {
+				return nil, jwt.ErrFailedAuthentication
+			}
+			return &Models.User{
+				Email:     user.Email,
+				GivenName: user.GivenName,
+				SurnName:  user.SurnName,
+			}, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*Models.User); ok && v.Email == "admin" {
+			if v, ok := data.(*Models.User); ok && v.Email == "user1@email.com" {
 				return true
 			}
 

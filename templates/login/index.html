@@ -1,0 +1,66 @@
+{{ define "content" }}
+<form action="/login" method="post">
+  <div class="login-portal">
+    <div class="icon-container">
+      <span class="material-icons" style="font-size: 12rem;">
+        lock
+      </span>
+    </div>
+    <div class="">
+      <h1 class="app-name">Encrypted Chat</h1>
+    </div>
+    <div class="mb-3">
+      <label for="username-input" class="form-label">Username</label>
+      <input
+        class="form-control input-field"
+        id="username-input"
+        placeholder="username"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="password-input" class="form-label">Password</label>
+      <input
+        type="email"
+        class="form-control input-field"
+        id="password-input"
+        placeholder="password"
+      />
+    </div>
+    <div class="">
+      <p>If you don't have a account, Please <a href="/signup">SIGN UP</a></p>
+    </div>
+  </div>
+</form>
+<style>
+  .app-name {
+    text-align: center;
+  }
+  label {
+    color: grey !important;
+  }
+  .icon-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .login-portal {
+    grid-area: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8rem;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(255, 255, 255, 1);
+  }
+  .app-icon {
+    color: white;
+    align-self: center;
+    width: 12rem;
+    height: 12rem;
+    border-radius: 12rem;
+  }
+  .input-field {
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(255, 255, 255, 1);
+  }
+</style>
+{{ end }}
