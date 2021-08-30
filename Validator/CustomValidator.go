@@ -38,13 +38,13 @@ func (v *DefaultValidator) Engine() interface{} {
 
 func (v *DefaultValidator) lazyinit() {
 	v.once.Do(func() {
-    v.validate = validator.New()
-    v.validate.SetTagName("binding")    // Print JSON name on validator.FieldError.Field()
-    v.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-      name := strings.SplitN(fld.Tag.Get("form"), ",", 2)[0]
+		v.validate = validator.New()
+		v.validate.SetTagName("binding") // Print JSON name on validator.FieldError.Field()
+		v.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+			name := strings.SplitN(fld.Tag.Get("form"), ",", 2)[0]
 			return name
-    })
-  })
+		})
+	})
 }
 
 func kindOfData(data interface{}) reflect.Kind {
@@ -78,4 +78,16 @@ func (q FieldError) String() string {
 	}
 
 	return sb.String()
+}
+
+type ValidationErrors struct {
+	errs []validator.FieldError
+}
+
+func (validationErrors ValidationErrors) GetMsgMap() map[string]string {
+	var validateMsg = make(map[string]string)
+	for _, fieldErr := range validationErrors.errs {
+		validateMsg[fieldErr.StructField()] = fieldErr.ActualTag()
+	}
+	return validateMsg
 }

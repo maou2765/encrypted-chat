@@ -1,3 +1,141 @@
 {{ define "content" }}
-<form action="/login" method="post"></form>
+<form action="/signup" method="post">
+  <div class="left-container">
+    <div class="col-md-12">
+      <label for="givenName" class="form-label title">
+        Given Name
+      </label>
+      <input
+        type="text"
+        class="form-control form-input-box {{with .GivenNameErr}}is-invalid{{end}}"
+        placeholder="Given Name"
+        name="givenName"
+        value="{{.GivenName}}"
+      />
+      {{with .GivenNameErr}}
+      <div class="invalid-feedback">
+        {{.}}
+      </div>
+      {{end}}
+    </div>
+    <div class="col-md-12">
+      <label for="surnname" class="form-label title">
+        Surnname
+      </label>
+      <input
+        type="text"
+        class="form-control form-input-box {{with .SurnNameErr}}is-invalid{{end}}"
+        placeholder="Surnname"
+        name="surnname"
+      />
+      {{with .SurnNameErr}}
+      <div class="invalid-feedback">
+        {{.}}
+      </div>
+      {{end}}
+    </div>
+    <div class="col-md-12">
+      <label for="bio" class="form-label title">
+        Bio
+      </label>
+      <input
+        type="text"
+        class="form-control form-input-box {{with .BioErr}}is-invalid{{end}}"
+        placeholder="Bio"
+        name="bio"
+      />
+      {{with .BioErr}}
+      <div class="invalid-feedback">
+        {{.}}
+      </div>
+      {{end}}
+    </div>
+    <div class="col-md-12">
+      <label for="email" class="form-label title">
+        Email
+      </label>
+      <input
+        type="text"
+        class="form-control form-input-box {{with .EmailErr}}is-invalid{{end}}"
+        placeholder="Email"
+        name="email"
+      />
+      {{with .EmailErr}}
+      <div class="invalid-feedback">
+        {{.}}
+      </div>
+      {{end}}
+    </div>
+    <div class="col-md-12">
+      <label for="password" class="form-label title">
+        Password
+      </label>
+      <input
+        type="password"
+        class="form-control form-input-box {{with .PasswordErr}}is-invalid{{end}}"
+        placeholder="Password"
+        name="password"
+      />
+      {{with .PasswordErr}}
+      <div class="invalid-feedback">
+        {{.}}
+      </div>
+      {{end}}
+    </div>
+    <div class="col-md-12">
+      <label for="confirm_password" class="form-label title">
+        Confirm Password
+      </label>
+      <input
+        type="password"
+        class="form-control form-input-box"
+        placeholder="Confirm Password"
+        name="confirm_password"
+      />
+      <div class="invalid-feedback">
+        Confirm Password not same with password inputed
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" id="submit-btn">
+      Submit
+    </button>
+  </div>
+</form>
+<script>
+  $(document).ready(function () {
+    $("#submit-btn").click(function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (
+        $("[name|='confirm_password']").val() != $("[name|='password']").val()
+      ) {
+        $("[name|='confirm_password']").addClass("is-invalid");
+      }
+    });
+  });
+</script>
+<style>
+  .left-container {
+    width: 80vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .title {
+    color: #149414;
+    font-weight: 600;
+  }
+  .form-input-box,
+  .form-input-box:focus,
+  .form-input-box:hover {
+    background: #000;
+    color: #149414;
+    border: 0.1rem solid #149414;
+  }
+  .form-input-box:focus,
+  .form-input-box:hover {
+    border: 0.1rem solid #ff00ff;
+  }
+</style>
 {{end}}

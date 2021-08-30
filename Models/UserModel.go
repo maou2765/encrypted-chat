@@ -11,7 +11,7 @@ type User struct {
 	GivenName string `json:"given_name"`
 	SurnName  string `json:"surnname"`
 	IconURL   string `json:"icon_url"`
-	bio       string `json:"bio"`
+	Bio       string `json:"bio"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }

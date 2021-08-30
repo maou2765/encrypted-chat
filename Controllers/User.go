@@ -31,9 +31,9 @@ func Signup(c *gin.Context) {
 	var userValidator struct {
 		GivenName string `form:"givenName" json:"given_name" binding:"required,alpha"`
 		SurnName  string `form:"surnname" json:"surnname" binding:"alpha"`
-		IconURL   string `form:"iconURL" json:"icon_url" binding:"uri"`
-		bio       string `form:"bio" json:"bio" binding:"alpha"`
-		Email     string `form:"email" json:"email" bind:"email"`
+		IconURL   string `form:"iconURL" json:"icon_url" binding:"omitempty,uri"`
+		Bio       string `form:"bio" json:"bio" binding:"omitempty,alpha"`
+		Email     string `form:"email" json:"email" bind:"omitempty,email"`
 		Password  string `json:"password"`
 	}
 	binding.Validator = new(Validator.DefaultValidator)
@@ -57,15 +57,19 @@ func Signup(c *gin.Context) {
 			c.JSON(http.StatusOK, user)
 		}
 	} else {
+		var context = make(gin.H)
+		c.ShouldBindJSON(userValidator)
+		context["GivenName"] = userValidator.GivenName
+		context["SurnName"] = userValidator.SurnName
+		context["IconURL"] = userValidator.IconURL
+		context["Bio"] = userValidator.Bio
+		context["Email"] = userValidator.Email
+		context["Password"] = ""
 		for _, fieldErr := range ve.(validator.ValidationErrors) {
-			fmt.Println(fieldErr.StructField())
-			fmt.Println(fieldErr.Value())
-			fmt.Println(fieldErr.ActualTag())
+			context[fieldErr.StructField()+"Err"] = fieldErr.ActualTag()
 		}
-		// for key, err := range ve {
-		// 	fmt.Println(fmt.Sprintf("Key: '%s' Error:Field validation for '%s' failed on the '%s' tag", key, err.Field, err.Tag))
-		// }
-		c.JSON(http.StatusBadRequest, gin.H{"error": ve.Error()})
+		fmt.Println(context)
+		c.HTML(http.StatusOK, "signup", context)
 	}
 
 }
