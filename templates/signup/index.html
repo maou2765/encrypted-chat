@@ -3,13 +3,13 @@
   <div class="left-container">
     <div class="col-md-12">
       <label for="givenName" class="form-label title">
-        Given Name
+        {{ .GivenNameT }}
       </label>
       <input
         type="text"
         class="form-control form-input-box {{with .GivenNameErr}}is-invalid{{end}}"
-        placeholder="Given Name"
-        name="givenName"
+        placeholder="{{.GivenNameT}}"
+        name="given_name"
         value="{{.GivenName}}"
       />
       {{with .GivenNameErr}}
@@ -20,13 +20,14 @@
     </div>
     <div class="col-md-12">
       <label for="surnname" class="form-label title">
-        Surnname
+        {{ .SurnnameT }}
       </label>
       <input
         type="text"
         class="form-control form-input-box {{with .SurnNameErr}}is-invalid{{end}}"
-        placeholder="Surnname"
+        placeholder="{{ .SurnnameT }}"
         name="surnname"
+        value="{{.SurnName}}"
       />
       {{with .SurnNameErr}}
       <div class="invalid-feedback">
@@ -36,13 +37,14 @@
     </div>
     <div class="col-md-12">
       <label for="bio" class="form-label title">
-        Bio
+        {{ .BioT}}
       </label>
       <input
         type="text"
         class="form-control form-input-box {{with .BioErr}}is-invalid{{end}}"
-        placeholder="Bio"
+        placeholder="{{ .BioT}}"
         name="bio"
+        value="{{.Bio}}"
       />
       {{with .BioErr}}
       <div class="invalid-feedback">
@@ -52,13 +54,14 @@
     </div>
     <div class="col-md-12">
       <label for="email" class="form-label title">
-        Email
+        {{ .EmailT }}
       </label>
       <input
         type="text"
         class="form-control form-input-box {{with .EmailErr}}is-invalid{{end}}"
-        placeholder="Email"
+        placeholder="{{ .EmailT }}"
         name="email"
+        value="{{ .Email }}"
       />
       {{with .EmailErr}}
       <div class="invalid-feedback">
@@ -68,12 +71,12 @@
     </div>
     <div class="col-md-12">
       <label for="password" class="form-label title">
-        Password
+        {{ .PasswordT}}
       </label>
       <input
         type="password"
         class="form-control form-input-box {{with .PasswordErr}}is-invalid{{end}}"
-        placeholder="Password"
+        placeholder="{{ .PasswordT}}"
         name="password"
       />
       {{with .PasswordErr}}
@@ -84,12 +87,12 @@
     </div>
     <div class="col-md-12">
       <label for="confirm_password" class="form-label title">
-        Confirm Password
+        {{ .ConfirmPasswordT}}
       </label>
       <input
         type="password"
         class="form-control form-input-box"
-        placeholder="Confirm Password"
+        placeholder="{{ .ConfirmPasswordT}}"
         name="confirm_password"
       />
       <div class="invalid-feedback">
@@ -101,19 +104,7 @@
     </button>
   </div>
 </form>
-<script>
-  $(document).ready(function () {
-    $("#submit-btn").click(function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (
-        $("[name|='confirm_password']").val() != $("[name|='password']").val()
-      ) {
-        $("[name|='confirm_password']").addClass("is-invalid");
-      }
-    });
-  });
-</script>
+<!-- <script src="/static/js/validate_signup.js"></script> -->
 <style>
   .left-container {
     width: 80vw;

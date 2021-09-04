@@ -3,14 +3,17 @@
 package Controllers
 
 import (
+	"encrypted-chat/Localize"
 	"encrypted-chat/Models"
 	"encrypted-chat/Validator"
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -21,25 +24,55 @@ const (
 	DefaultCost int = 10 // the cost that will actually be set if a cost below MinCost is passed into GenerateFromPassword
 )
 
+func GetSignupPageTranslation(context *gin.H, localizer *i18n.Localizer) {
+	(*context)["GivenNameT"] = localizer.MustLocalize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{
+			ID:    "GivenName",
+			Other: "Given Name",
+		},
+	})
+	(*context)["SurnnameT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Surnname",
+		Other: "Surnname",
+	})
+	(*context)["BioT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Bio",
+		Other: "Bio",
+	})
+	(*context)["EmailT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Email",
+		Other: "Email",
+	})
+	(*context)["PasswordT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Password",
+		Other: "Password",
+	})
+	(*context)["ConfirmPasswordT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "ConfirmPassword",
+		Other: "Confirm Password",
+	})
+}
+
+func PasswordValidator(pw string) bool {
+	var passwordRegexp = regexp.MustCompile(`(?=[a-z]){8,45}`)
+	return passwordRegexp.MatchString(pw)
+}
+
 func LoginIndex(c *gin.Context) {
 	c.HTML(http.StatusOK, "login", gin.H{})
 }
 func SignupIndex(c *gin.Context) {
-	c.HTML(http.StatusOK, "signup", gin.H{})
+	localizer := Localize.GetLocalizer(c)
+	var context = make(gin.H)
+	GetSignupPageTranslation(&context, localizer)
+	fmt.Println(context["confirmPasswordT"])
+	c.HTML(http.StatusOK, "signup", context)
 }
 func Signup(c *gin.Context) {
-	var userValidator struct {
-		GivenName string `form:"givenName" json:"given_name" binding:"required,alpha"`
-		SurnName  string `form:"surnname" json:"surnname" binding:"alpha"`
-		IconURL   string `form:"iconURL" json:"icon_url" binding:"omitempty,uri"`
-		Bio       string `form:"bio" json:"bio" binding:"omitempty,alpha"`
-		Email     string `form:"email" json:"email" bind:"omitempty,email"`
-		Password  string `json:"password"`
-	}
 	binding.Validator = new(Validator.DefaultValidator)
-	var ve = c.ShouldBind(&userValidator)
+	var user Models.User
+	var ve = c.ShouldBind(&user)
 	if ve == nil {
-		var user Models.User
 		c.ShouldBindJSON(user)
 		hash, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), DefaultCost)
 		if hashErr != nil {
@@ -47,7 +80,6 @@ func Signup(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 		}
 		user.Password = string(hash)
-		log.Println(user.Password)
 
 		createError := Models.CreateUser(&user)
 		if createError != nil {
@@ -58,17 +90,20 @@ func Signup(c *gin.Context) {
 		}
 	} else {
 		var context = make(gin.H)
-		c.ShouldBindJSON(userValidator)
-		context["GivenName"] = userValidator.GivenName
-		context["SurnName"] = userValidator.SurnName
-		context["IconURL"] = userValidator.IconURL
-		context["Bio"] = userValidator.Bio
-		context["Email"] = userValidator.Email
+		c.ShouldBindJSON(user)
+		localizer := Localize.GetLocalizer(c)
+		GetSignupPageTranslation(&context, localizer)
+		context["GivenName"] = user.GivenName
+		context["SurnName"] = user.SurnName
+		context["IconURL"] = user.IconURL
+		context["Bio"] = user.Bio
+		context["Email"] = user.Email
 		context["Password"] = ""
 		for _, fieldErr := range ve.(validator.ValidationErrors) {
 			context[fieldErr.StructField()+"Err"] = fieldErr.ActualTag()
 		}
 		fmt.Println(context)
+		fmt.Println(context["GivenNameT"])
 		c.HTML(http.StatusOK, "signup", context)
 	}
 

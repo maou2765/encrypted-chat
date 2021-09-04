@@ -3,6 +3,7 @@ package Middlewares
 import (
 	"encrypted-chat/Models"
 	"log"
+	"net/http"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -19,8 +20,8 @@ var identityKey = Models.UserIdentityKey
 
 func AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test",
-		Key:         []byte("secret"),
+		Realm:       "chatroom",
+		Key:         []byte("wbCK8WIr_f|wI4W%^4-:MYWmfR0PW-5S33SC1M&L9o#Se5gS0L>g?^?@u-CnphfO1?trK&EFwTyIw:98ldW0pGWEm"),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
@@ -80,7 +81,14 @@ func AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		// TokenLookup: "cookie:token",
 
 		// TokenHeadName is a string in the header. Default value is "Bearer"
-		TokenHeadName: "Bearer",
+		TokenHeadName:  "Bearer",
+		SendCookie:     true,
+		SecureCookie:   false, //non HTTPS dev environments
+		CookieHTTPOnly: true,  // JS can't modify
+		CookieDomain:   "localhost:8080",
+		CookieName:     "jwt", // default jwt
+		// TokenLookup:    "cookie:token",
+		CookieSameSite: http.SameSiteDefaultMode, //SameSiteDefaultMode, SameSiteLaxMode, SameSiteStrictMode, SameSiteNoneMode
 
 		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
 		TimeFunc: time.Now,

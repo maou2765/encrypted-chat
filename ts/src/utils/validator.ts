@@ -5,6 +5,15 @@ import isEmail from "validator/lib/isEmail";
  * usage: pass a object with field name as key,
  * "|" separated string as rules of the field
  * example: {"name":"required|minLength:5|maxLength:20"}
+ * list of rules:
+ * required,
+ * maxLength, //apply to string
+ * minLength, //apply to string
+ * regexp, //apply to string
+ * max, //apply to number
+ * min, //apply to number
+ * same, //will convert the input to string before compare
+ * alpha, //check if the input only consist of alphabet
  * @param rules { [key: string]: string }
  */
 export default function validator(rules: { [key: string]: string }) {

@@ -11,6 +11,7 @@ import (
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-contrib/multitemplate"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,6 +35,8 @@ func SetupRouter() *gin.Engine {
 	// gin.DisableConsoleColor()
 	r := gin.Default()
 	r.Use(gin.Recovery())
+	// r.StaticFS("/static", http.Dir("/static"))
+	r.Use(static.Serve("/static", static.LocalFile("./static", false)))
 	r.HTMLRender = createHTMLRender()
 
 	gin.DefaultWriter = io.MultiWriter(os.Stdout)
