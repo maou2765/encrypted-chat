@@ -7,27 +7,30 @@
       </span>
     </div>
     <div class="">
-      <h1 class="app-name">Encrypted Chat</h1>
+      <h1 class="app-name">{{.AppNameT}}</h1>
     </div>
     <div class="mb-3">
-      <label for="username-input" class="form-label">Username</label>
+      <label for="username-input" class="form-label">{{.EmailT}}</label>
       <input
         class="form-control input-field"
         id="username-input"
         placeholder="username"
+        name="email"
       />
     </div>
     <div class="mb-3">
-      <label for="password-input" class="form-label">Password</label>
+      <label for="password-input" class="form-label">{{.PasswordT}}</label>
       <input
-        type="email"
+        type="password"
         class="form-control input-field"
         id="password-input"
         placeholder="password"
+        name="password"
       />
     </div>
+    <button type="submit" class="btn btn-primary">{{ .SignInT }}</button>
     <div class="">
-      <p>If you don't have a account, Please <a href="/signup">SIGN UP</a></p>
+      <p>{{ .NoACT }}<a href="/signup">{{ .SignUpT }}</a></p>
     </div>
   </div>
 </form>

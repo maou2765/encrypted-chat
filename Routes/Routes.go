@@ -28,6 +28,8 @@ func createHTMLRender() multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
 	r.AddFromFiles("login", "templates/layouts/base.html", "templates/login/index.html")
 	r.AddFromFiles("signup", "templates/layouts/base.html", "templates/signup/index.html")
+	r.AddFromFiles("add_friend", "templates/layouts/base.html", "templates/add_friend/index.html")
+	r.AddFromFiles("chat", "templates/layouts/base.html", "templates/chat/index.html")
 	return r
 }
 func SetupRouter() *gin.Engine {
@@ -63,19 +65,29 @@ func SetupRouter() *gin.Engine {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 
-	auth := r.Group("/auth")
+	auth := r.Group("/")
+	auth.GET("/refresh-token", authMiddleware.RefreshHandler)
 	// Refresh time can be longer than token timeout
-	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{
 		auth.GET("/hello", welcomeHandler)
-		grp1 := auth.Group("/user-api")
+		userGp := auth.Group("/user")
 		{
-			grp1.GET("user", Controllers.GetUsers)
-			grp1.POST("user", Controllers.CreateUser)
-			grp1.GET("user/:id", Controllers.GetUserByID)
-			grp1.PUT("user/:id", Controllers.UpdateUser)
-			grp1.DELETE("user/:id", Controllers.DeleteUser)
+			userGp.GET("", Controllers.GetUsers)
+			userGp.POST("", Controllers.CreateUser)
+			userGp.GET("/:id", Controllers.GetUserByID)
+			userGp.PUT("/:id", Controllers.UpdateUser)
+			userGp.DELETE("/:id", Controllers.DeleteUser)
+		}
+		fdGp := auth.Group("/friends")
+		{
+			fdGp.GET("", Controllers.SearchFriends)
+			fdGp.POST("", Controllers.AddFriends)
+			fdGp.GET("/add", Controllers.AddFriendIndex)
+		}
+		chatGp := auth.Group("/chats")
+		{
+			chatGp.GET("", Controllers.ChatIndex)
 		}
 	}
 

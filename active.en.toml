@@ -1,3 +1,14 @@
+AppName = "Encrypted Chat"
 Bio = "Bio"
+ConfirmPassword = "Confirm Password"
+Email = "Email"
 GivenName = "Given Name"
-Surnname = "Surnname"
+NoAC = "If you don't have a account, Please "
+Password = "Password"
+SignIn = "Sign In"
+SignUp = "SIGN UP"
+Surname = "Surname"
+
+[Friend]
+one = "Friend"
+other = "Friends"

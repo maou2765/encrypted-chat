@@ -1,0 +1,80 @@
+{{ define "content" }}
+<div class="login-portal">
+  <div class="mb-3">
+    <label for="search-keyword" class="form-label">{{ .KeywordT }}</label>
+    <input
+      type="text"
+      class="form-control"
+      id="search-keyword"
+      aria-describedby="emailHelp"
+    />
+    <div id="emailHelp" class="form-text">{{ .SearchFdInstructionT }}</div>
+    <p class="subtitle hidden" id="add-friend-subtitle">
+      {{ .AddedFriendsT }}
+    </p>
+    <div id="added-friends" class="container-sm"></div>
+    <p class="subtitle">
+      {{ .FriendT }}
+    </p>
+    <div id="friend-list" class="container-sm"></div>
+  </div>
+  <div class="row justify-content-between">
+    <div class="col-md-3">
+      <a type="link" class="btn btn-secondary" id="skip-btn" href="/chats">
+        {{ .SkipT }}
+      </a>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary" id="add-btn">{{ .AddT }}</button>
+    </div>
+  </div>
+</div>
+<script src="/static/js/auto_complete.js"></script>
+<style>
+  .app-name {
+    text-align: center;
+  }
+  label, .subtitle {
+    color: {{.Theme.Primary}} !important;
+  }
+  .icon-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .login-portal {
+    grid-area: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8rem;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(255, 255, 255, 1);
+  }
+  .app-icon {
+    color: white;
+    align-self: center;
+    width: 12rem;
+    height: 12rem;
+    border-radius: 12rem;
+  }
+  .input-field {
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(255, 255, 255, 1);
+  }
+  .friend-row,
+  .friend-row:focus,
+  .friend-row:hover {
+    color: {{ .Theme.Primary }};
+    border: 1px solid {{ .Theme.Primary }};
+    margin-top: 1rem;
+    background-color: rgba(0,0,0,0)
+  }
+  .friend-row:focus,
+  .friend-row:hover {
+    border: 0.1rem solid {{ .Theme.Hover }};
+  }
+  .hidden {
+    opacity: 0;
+  }
+</style>
+{{end}}

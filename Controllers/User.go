@@ -4,12 +4,14 @@ package Controllers
 
 import (
 	"encrypted-chat/Localize"
+	"encrypted-chat/Middlewares"
 	"encrypted-chat/Models"
 	"encrypted-chat/Validator"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -31,9 +33,9 @@ func GetSignupPageTranslation(context *gin.H, localizer *i18n.Localizer) {
 			Other: "Given Name",
 		},
 	})
-	(*context)["SurnnameT"], _ = localizer.LocalizeMessage(&i18n.Message{
-		ID:    "Surnname",
-		Other: "Surnname",
+	(*context)["SurnameT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Surname",
+		Other: "Surname",
 	})
 	(*context)["BioT"], _ = localizer.LocalizeMessage(&i18n.Message{
 		ID:    "Bio",
@@ -59,7 +61,33 @@ func PasswordValidator(pw string) bool {
 }
 
 func LoginIndex(c *gin.Context) {
-	c.HTML(http.StatusOK, "login", gin.H{})
+	localizer := Localize.GetLocalizer(c)
+	context := make(gin.H)
+	context["AppNameT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "AppName",
+		Other: "Encrypted Chat",
+	})
+	context["EmailT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Email",
+		Other: "Email",
+	})
+	context["PasswordT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "Password",
+		Other: "Password",
+	})
+	context["SignInT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "SignIn",
+		Other: "Sign In",
+	})
+	context["NoACT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "NoAC",
+		Other: "If you don't have a account, Please ",
+	})
+	context["SignUpT"], _ = localizer.LocalizeMessage(&i18n.Message{
+		ID:    "SignUp",
+		Other: "SIGN UP",
+	})
+	c.HTML(http.StatusOK, "login", context)
 }
 func SignupIndex(c *gin.Context) {
 	localizer := Localize.GetLocalizer(c)
@@ -80,13 +108,36 @@ func Signup(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 		}
 		user.Password = string(hash)
+		user.Language = Models.EN_US
 
 		createError := Models.CreateUser(&user)
 		if createError != nil {
 			fmt.Println(createError.Error())
 			c.AbortWithStatus(http.StatusInternalServerError)
 		} else {
-			c.JSON(http.StatusOK, user)
+			mw, err := Middlewares.AuthMiddleware()
+
+			// expire := mw.TimeFunc().Add(mw.Timeout)
+			expireCookie := mw.TimeFunc().Add(mw.CookieMaxAge)
+			maxage := int(expireCookie.Unix() - time.Now().Unix())
+
+			jwtString, cookiesTime, err := mw.TokenGenerator(&user)
+			fmt.Println(cookiesTime)
+			fmt.Println(err)
+			if mw.CookieSameSite != 0 {
+				c.SetSameSite(mw.CookieSameSite)
+			}
+
+			c.SetCookie(
+				mw.CookieName,
+				jwtString,
+				maxage,
+				"/",
+				mw.CookieDomain,
+				mw.SecureCookie,
+				mw.CookieHTTPOnly,
+			)
+			c.Redirect(http.StatusMovedPermanently, "/friends/add")
 		}
 	} else {
 		var context = make(gin.H)
@@ -94,7 +145,7 @@ func Signup(c *gin.Context) {
 		localizer := Localize.GetLocalizer(c)
 		GetSignupPageTranslation(&context, localizer)
 		context["GivenName"] = user.GivenName
-		context["SurnName"] = user.SurnName
+		context["Surname"] = user.Surname
 		context["IconURL"] = user.IconURL
 		context["Bio"] = user.Bio
 		context["Email"] = user.Email
@@ -111,13 +162,15 @@ func Signup(c *gin.Context) {
 
 //GetUsers ... Get all users
 func GetUsers(c *gin.Context) {
-	var user []Models.User
-	err := Models.GetAllUsers(&user)
-	if err != nil {
+	var users []Models.UserDetail
+	if err := Models.GetAllUsers(&users); err != nil {
 		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
-		c.JSON(http.StatusOK, user)
+		log.Println(users)
+		c.JSON(http.StatusOK, gin.H{
+			"users": users,
+		})
 	}
 }
 
@@ -128,14 +181,15 @@ func CreateUser(c *gin.Context) {
 	hash, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), DefaultCost)
 	if hashErr != nil {
 		log.Println(hashErr.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	}
 	user.Password = string(hash)
+	user.Status = 0
 	log.Println(user.Password)
 	err := Models.CreateUser(&user)
 	if err != nil {
 		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -147,7 +201,7 @@ func GetUserByID(c *gin.Context) {
 	err := Models.GetUserByID(&user, id)
 	if err != nil {
 		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -161,12 +215,14 @@ func UpdateUser(c *gin.Context) {
 		fmt.Println(err.Error())
 	}
 	c.BindJSON(&user)
-	err = Models.UpdateUser(&user, id)
+	err = Models.UpdateUser(&user)
 	if err != nil {
 		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, gin.H{
+			"user": user,
+		})
 	}
 }
 
@@ -176,7 +232,7 @@ func DeleteUser(c *gin.Context) {
 	err := Models.DeleteUser(&user, id)
 	if err != nil {
 		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
 		c.JSON(http.StatusOK, user)
 	}

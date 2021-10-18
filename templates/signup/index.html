@@ -19,17 +19,17 @@
       {{end}}
     </div>
     <div class="col-md-12">
-      <label for="surnname" class="form-label title">
-        {{ .SurnnameT }}
+      <label for="surname" class="form-label title">
+        {{ .SurnameT }}
       </label>
       <input
         type="text"
-        class="form-control form-input-box {{with .SurnNameErr}}is-invalid{{end}}"
-        placeholder="{{ .SurnnameT }}"
-        name="surnname"
-        value="{{.SurnName}}"
+        class="form-control form-input-box {{with .SurnameErr}}is-invalid{{end}}"
+        placeholder="{{ .SurnameT }}"
+        name="surname"
+        value="{{.Surname}}"
       />
-      {{with .SurnNameErr}}
+      {{with .SurnameErr}}
       <div class="invalid-feedback">
         {{.}}
       </div>
@@ -104,7 +104,7 @@
     </button>
   </div>
 </form>
-<!-- <script src="/static/js/validate_signup.js"></script> -->
+<script src="/static/js/validate_signup.js"></script>
 <style>
   .left-container {
     width: 80vw;
