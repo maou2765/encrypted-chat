@@ -8,7 +8,7 @@ import "@testing-library/jest-dom";
 const HTMLForm = `<html>
 <form>
 <input type="text" name="given_name" value="abc a" data-testid="given_name"/>
-<input type="text" name="surnname" value="abc" data-testid="surnname"/>/>
+<input type="text" name="surname" value="abc" data-testid="surname"/>/>
 <input type="text" name="middle_name" value="abc" data-testid="middle_name"/>/>
 <input type="text" name="long_name" value="abcdefghi" data-testid="long_name"/>/>
 <input type="text" name="short_name" value="ab" data-testid="short_name"/>/>
@@ -33,8 +33,8 @@ test.each([
   [{ long_name: "regexp:^[abc]*$" }, false],
   [{ given_name: "required|maxLength:5" }, true],
   [{ given_name: "required|maxLength:4" }, false],
-  [{ given_name: "required|maxLength:5|same:surnname" }, false],
-  [{ surnname: "required|maxLength:5|same:middle_name" }, true],
+  [{ given_name: "required|maxLength:5|same:surname" }, false],
+  [{ surname: "required|maxLength:5|same:middle_name" }, true],
   [{ large_number: "max:5" }, false],
   [{ large_number: "max:12" }, true],
   [{ small_number: "min:1" }, true],
@@ -64,8 +64,8 @@ test.each([
   [{ long_name: "regexp:^[abc]*$" }, false],
   [{ given_name: "required|maxLength:5" }, true],
   [{ given_name: "required|maxLength:4" }, false],
-  [{ given_name: "required|maxLength:5|same:surnname" }, false],
-  [{ surnname: "required|maxLength:5|same:middle_name" }, true],
+  [{ given_name: "required|maxLength:5|same:surname" }, false],
+  [{ surname: "required|maxLength:5|same:middle_name" }, true],
   [{ large_number: "max:5" }, false],
   [{ large_number: "max:12" }, true],
   [{ small_number: "min:1" }, true],

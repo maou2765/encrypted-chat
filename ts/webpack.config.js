@@ -1,5 +1,5 @@
 const path = require("path");
-const fileList = ["./src/validate_signup.ts"];
+const fileList = ["./src/validate_signup.ts", "./src/auto_complete.ts"];
 
 module.exports = fileList.map((fileName) => ({
   entry: fileName,
